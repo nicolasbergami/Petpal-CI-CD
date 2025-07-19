@@ -1,0 +1,48 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  backendPath: 'Backend'
+  imageName: 'petpal-backend'
+  tag: '$(Build.BuildId)'
+
+stages:
+  - stage: Build
+    jobs:
+      - job: BuildDockerImage
+        steps:
+          - task: Docker@2
+            displayName: Build image
+            inputs:
+              command: build
+              Dockerfile: '$(backendPath)/Dockerfile'
+              tags: '$(tag)'
+              buildContext: '$(backendPath)'
+          
+          # Agregá acá un paso de test unitario cuando lo tengamos
+
+  - stage: DeployQA
+    condition: succeeded()
+    jobs:
+      - job: DeployToQA
+        steps:
+          - script: echo "🚀 Aquí iría el deploy automático a QA (Azure Container Instances, App Service, etc.)"
+            displayName: Placeholder de Deploy QA
+
+  - stage: DeployPROD
+    dependsOn: DeployQA
+    condition: succeeded()
+    approval:
+      approvals:
+        - approvers:
+            - nicolasbergami
+    jobs:
+      - job: DeployToProd
+        steps:
+          - script: echo "🟢 Aquí iría el deploy final a PRODUCCIÓN con aprobación manual"
+            displayName: Placeholder de Deploy Prod
