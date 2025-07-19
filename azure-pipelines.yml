@@ -37,10 +37,7 @@ stages:
   - stage: DeployPROD
     dependsOn: DeployQA
     condition: succeeded()
-    approval:
-      approvals:
-        - approvers:
-            - nicolasbergami
+   
     jobs:
       - job: DeployToProd
         steps:
